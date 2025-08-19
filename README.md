@@ -40,6 +40,33 @@ In this folder we dump the output of the different tests for further analysis.
 ## Base steps
   1. Download [TPC-DS Tools](https://www.tpc.org/tpc_documents_current_versions/current_specifications5.asp) or the [TPC-DS Kit](https://github.com/gregrahn/tpcds-kit) which solves some common errors.
   2. Build Tools as described in 'tools\How_To_Guide-DS-V2.0.0.docx'.
+
+### macOS Compatibility Notes
+If you're building the TPC-DS Kit on macOS, you may encounter compilation errors. Here are the common fixes needed:
+
+#### Common Issues and Solutions:
+1. **`values.h` header not found**: Comment out `#include <values.h>` in `porting.h`
+2. **`MAXINT` undefined**: Add these lines to files that use `MAXINT`:
+   ```c
+   #include <limits.h>
+   #ifndef MAXINT
+   #define MAXINT INT_MAX
+   #endif
+   ```
+3. **K&R function declarations**: Update old-style function declarations to modern C syntax:
+   ```c
+   // Change from:
+   int function_name(param1, param2)
+   // To:
+   int function_name(int param1, int param2)
+   ```
+
+#### Files That May Need Updates:
+- `tools/porting.h` - Comment out `#include <values.h>`
+- `tools/genrand.c` and `tools/nulls.c` - Add `MAXINT` definition
+- `tools/date.c`, `tools/tdef_functions.c`, `tools/tdefs.c` - Fix function declarations
+
+After applying these fixes, the tools should compile successfully on macOS using the standard `make` command.
   3. Create DB.
   4. Take the DB schema described in tpcds.sql and tpcds_ri.sql (they are located in the 'side_files' folder). Do not run tpcds_ri.sql until the data has been loaded.
   5. Generate data to be stored to the database.
